@@ -1,1 +1,10 @@
-builds
+# Build artefacts
+build
+.sconsign.dblite
+
+# QtCreator project files
+ConceptIdiom.config
+ConceptIdiom.creator
+ConceptIdiom.creator.user
+ConceptIdiom.files
+ConceptIdiom.includes
