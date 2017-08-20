@@ -9,19 +9,19 @@
 
 using namespace std;
 
-class MyClass {
+class MyClassA {
 public:
-  MyClass(const string& name) :
+  MyClassA(const string& name) :
     name_(name)
   { }
 
-  friend size_t serialize(const MyClass& x, uint8_t* buffer, size_t bufferSize);
-  friend size_t size(const MyClass& x);
+  friend size_t serialize(const MyClassA& x, uint8_t* buffer, size_t bufferSize);
+  friend size_t size(const MyClassA& x);
 private:
   const string name_;
 };
 
-size_t serialize(const MyClass& x, uint8_t* buffer, size_t bufferSize) {
+size_t serialize(const MyClassA& x, uint8_t* buffer, size_t bufferSize) {
   size_t bytesToWrite = size(x);
   if(bytesToWrite <= bufferSize) {
       memcpy(buffer, x.name_.c_str(), bytesToWrite);
@@ -31,13 +31,39 @@ size_t serialize(const MyClass& x, uint8_t* buffer, size_t bufferSize) {
   return bytesToWrite;
 }
 
-size_t size(const MyClass& x) {
+size_t size(const MyClassA& x) {
+  x.name_.length();
+}
+
+class MyClassB {
+public:
+  MyClassB(const string& name) :
+    name_(name)
+  { }
+
+  friend size_t serialize(const MyClassB& x, uint8_t* buffer, size_t bufferSize);
+  friend size_t size(const MyClassB& x);
+private:
+  const string name_;
+};
+
+size_t serialize(const MyClassB& x, uint8_t* buffer, size_t bufferSize) {
+  size_t bytesToWrite = size(x);
+  if(bytesToWrite <= bufferSize) {
+      memcpy(buffer, x.name_.c_str(), bytesToWrite);
+    } else {
+      bytesToWrite = 0;
+    }
+  return bytesToWrite;
+}
+
+size_t size(const MyClassB& x) {
   x.name_.length();
 }
 
 /******************************************************************************/
 
-size_t size(const vector<Object>& x) {
+size_t size(const vector<Serializable>& x) {
   size_t totalSize = 0;
   for (auto& e : x) {
       totalSize += size(e);
@@ -45,7 +71,7 @@ size_t size(const vector<Object>& x) {
   return totalSize;
 }
 
-size_t serialize(const vector<Object>& x, uint8_t* buffer, size_t bufferSize) {
+size_t serialize(const vector<Serializable>& x, uint8_t* buffer, size_t bufferSize) {
   size_t bytesToWrite = size(x);
   size_t offset = 0;
   if(bytesToWrite <= bufferSize) {
@@ -61,11 +87,17 @@ size_t serialize(const vector<Object>& x, uint8_t* buffer, size_t bufferSize) {
 /******************************************************************************/
 
 int main() {
-  vector<Object> channel;
-  uint8_t buffer[20] = {};
+  vector<Serializable> channel;
+  uint8_t buffer[30] = {};
 
-  channel.emplace_back(MyClass("hi"));
-  channel.emplace_back(MyClass(" there"));
+  MyClassA myClassA("Hello World!");
+  serialize(myClassA, buffer, sizeof buffer);
+  cout << buffer << endl;
+
+  cout << "-------------------" << endl;
+
+  channel.emplace_back(MyClassA(" Apples"));
+  channel.emplace_back(MyClassB(" Oranges"));
   serialize(channel, buffer, sizeof buffer);
   cout << buffer << endl;
 
@@ -75,7 +107,7 @@ int main() {
 
   cout << "-------------------" << endl;
 
-  vector<Object> channel2;
+  vector<Serializable> channel2;
   channel2.emplace_back(channel);
   channel2.emplace_back(channel);
   serialize(channel2, buffer, sizeof buffer);

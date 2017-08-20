@@ -6,16 +6,16 @@
 
 using namespace std;
 
-class Object {
+class Serializable {
 public:
   template <typename T>
-  Object(T x) : self_(new model<T>(move(x)))
+  Serializable(T x) : self_(new model<T>(move(x)))
   { }
 
-  friend size_t serialize(const Object& x, uint8_t* buffer, size_t bufferSize) {
+  friend size_t serialize(const Serializable& x, uint8_t* buffer, size_t bufferSize) {
     x.self_->serialize_(buffer, bufferSize);
   }
-  friend size_t size(const Object& x) {
+  friend size_t size(const Serializable& x) {
     x.self_->size_();
   }
 
