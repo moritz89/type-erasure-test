@@ -6,22 +6,6 @@
 
 using namespace std;
 
-template <typename T>
-size_t size(const T& x) {
-  return sizeof x;
-}
-
-template <typename T>
-size_t serialize(const T& x, uint8_t* buffer, size_t bufferSize) {
-  size_t bytesToWrite = size(x);
-  if(bytesToWrite <= bufferSize) {
-      memcpy(buffer, &x, bytesToWrite);
-    } else {
-      bytesToWrite = 0;
-    }
-  return bytesToWrite;
-}
-
 class Object {
 public:
   template <typename T>

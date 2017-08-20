@@ -37,9 +37,7 @@ size_t size(const MyClass& x) {
 
 /******************************************************************************/
 
-using Channel = vector<Object>;
-
-size_t size(const Channel& x) {
+size_t size(const vector<Object>& x) {
   size_t totalSize = 0;
   for (auto& e : x) {
       totalSize += size(e);
@@ -47,7 +45,7 @@ size_t size(const Channel& x) {
   return totalSize;
 }
 
-size_t serialize(const Channel& x, uint8_t* buffer, size_t bufferSize) {
+size_t serialize(const vector<Object>& x, uint8_t* buffer, size_t bufferSize) {
   size_t bytesToWrite = size(x);
   size_t offset = 0;
   if(bytesToWrite <= bufferSize) {
@@ -63,12 +61,11 @@ size_t serialize(const Channel& x, uint8_t* buffer, size_t bufferSize) {
 /******************************************************************************/
 
 int main() {
-  Channel channel;
+  vector<Object> channel;
   uint8_t buffer[20] = {};
 
-  channel.emplace_back(MyClass(string("hi")));
-  channel.emplace_back(' ');
-  channel.emplace_back(MyClass(string("there")));
+  channel.emplace_back(MyClass("hi"));
+  channel.emplace_back(MyClass(" there"));
   serialize(channel, buffer, sizeof buffer);
   cout << buffer << endl;
 
@@ -78,7 +75,7 @@ int main() {
 
   cout << "-------------------" << endl;
 
-  Channel channel2;
+  vector<Object> channel2;
   channel2.emplace_back(channel);
   channel2.emplace_back(channel);
   serialize(channel2, buffer, sizeof buffer);
