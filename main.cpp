@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "data_object.h"
-//#include "data_object_store.h"
 
 using namespace std;
 
@@ -14,7 +13,7 @@ class MyClass {
   public:
     MyClass(const string& name) :
         name_(name)
-    { cout << "MyClass ctor" << endl; }
+    { }
 
     friend size_t serialize(const MyClass& x, uint8_t* buffer, size_t bufferSize);
     friend size_t size(const MyClass& x);
@@ -40,9 +39,16 @@ size_t size(const MyClass& x)
 
 using Channel = vector<Object>;
 
+size_t size(const Channel& x)
+{
+    size_t totalSize = 0;
+    for (auto& e : x) totalSize += size(e);
+    return totalSize;
+}
+
 size_t serialize(const Channel& x, uint8_t* buffer, size_t bufferSize)
 {
-    size_t bytesToWrite = x.size();
+    size_t bytesToWrite = size(x);
     size_t offset = 0;
     if(bytesToWrite <= bufferSize)
     {
@@ -55,30 +61,31 @@ size_t serialize(const Channel& x, uint8_t* buffer, size_t bufferSize)
     }
     return bytesToWrite;
 }
-        
-size_t size(const Channel& x)
-{
-    size_t totalSize = 0; 
-    for (auto& e : x) totalSize += size(e);
-    return totalSize;
-}
 
 /******************************************************************************/
 
 int main()
 {
     Channel channel;
-    uint8_t buffer1[10];
+    uint8_t buffer[20] = {};
+
     channel.emplace_back(MyClass(string("hi")));
-    serialize(channel.back(), buffer1, sizeof buffer1);
-    cout << buffer1 << endl;
+    channel.emplace_back(' ');
+    channel.emplace_back(MyClass(string("there")));
+    serialize(channel, buffer, sizeof buffer);
+    cout << buffer << endl;
     
     cout << "-------------------" << endl;
 
-    uint8_t buffer2[10];
-    MyClass myClass2(string("hi there"));
-    serialize(myClass2, buffer2, sizeof buffer2);
-    cout << buffer2 << endl;
+    cout << size(channel) << endl;
+
+    cout << "-------------------" << endl;
+
+    Channel channel2;
+    channel2.emplace_back(channel);
+    channel2.emplace_back(channel);
+    serialize(channel2, buffer, sizeof buffer);
+    cout << buffer << endl;
 }
 
 #endif

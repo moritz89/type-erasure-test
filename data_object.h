@@ -7,18 +7,29 @@
 using namespace std;
 
 template <typename T>
-size_t serialize(const T& x, uint8_t* buffer, size_t bufferSize)
-{ return 0; }
+size_t size(const T& x)
+{ return sizeof x; }
 
 template <typename T>
-size_t size(const T& x)
-{ return 0; }
+size_t serialize(const T& x, uint8_t* buffer, size_t bufferSize)
+{
+    size_t bytesToWrite = size(x);
+    if(bytesToWrite <= bufferSize)
+    {
+        memcpy(buffer, &x, bytesToWrite);
+    }
+    else
+    {
+        bytesToWrite = 0;
+    }
+    return bytesToWrite;
+}
 
 class Object {
   public:
     template <typename T>
     Object(T x) : self_(new model<T>(move(x)))
-    { cout << "template ctor" << endl; }
+    { }
     
     friend size_t serialize(const Object& x, uint8_t* buffer, size_t bufferSize)
     { x.self_->serialize_(buffer, bufferSize); }
@@ -40,6 +51,7 @@ class Object {
           { size(data_); }
           
           T data_;
+
       };
       
       shared_ptr<const Concept> self_;
