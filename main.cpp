@@ -5,7 +5,10 @@
 #include <string.h>
 #include <vector>
 
-#include "data_object.h"
+#include "empty_model.h"
+#include "derived_type.h"
+#include "reportable.h"
+#include "serializable.h"
 
 using namespace std;
 
@@ -87,6 +90,11 @@ size_t serialize(const vector<Serializable>& x, uint8_t* buffer, size_t bufferSi
 /******************************************************************************/
 
 int main() {
+//  empty_model<MyClassC, Serializable::model, Reportable::model> model;
+//  auto f = make_shared<my_model<MyClassC>>(MyClassC{});
+  vector<SerializeReport> srChannel;
+  srChannel.emplace_back(MyClassC("hey"));
+
   vector<Serializable> channel;
   uint8_t buffer[30] = {};
 

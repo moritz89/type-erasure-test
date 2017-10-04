@@ -12,6 +12,9 @@ public:
   Serializable(T x) : self_(new model<T>(move(x)))
   { }
 
+  template <typename T>
+  Serializable(shared_ptr<const T> x) : self_(move(x)) { }
+
   friend size_t serialize(const Serializable& x, uint8_t* buffer, size_t bufferSize) {
     x.self_->serialize_(buffer, bufferSize);
   }
@@ -19,7 +22,7 @@ public:
     x.self_->size_();
   }
 
-private:
+public:
   struct Concept {
     virtual ~Concept() = default;
     virtual size_t serialize_(uint8_t*, size_t bufferSize) const = 0;
@@ -34,7 +37,6 @@ private:
     { size(data_); }
 
     T data_;
-
   };
 
   shared_ptr<const Concept> self_;
